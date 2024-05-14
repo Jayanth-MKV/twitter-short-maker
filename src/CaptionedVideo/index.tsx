@@ -1,13 +1,16 @@
 import {useCallback, useEffect, useState} from 'react';
 import {
 	AbsoluteFill,
+	Audio,
 	CalculateMetadataFunction,
 	cancelRender,
 	continueRender,
 	delayRender,
 	getStaticFiles,
+	interpolate,
 	OffthreadVideo,
 	Sequence,
+	staticFile,
 	useVideoConfig,
 	watchStaticFile,
 } from 'remotion';
@@ -85,14 +88,27 @@ export const CaptionedVideo: React.FC<{
 
 	return (
 		<AbsoluteFill style={{backgroundColor: 'white'}}>
-			<AbsoluteFill>
+			{/* <AbsoluteFill> */}
+				<Sequence from={0} durationInFrames={60}>
 				<OffthreadVideo
 					style={{
 						objectFit: 'cover',
+						objectPosition: 'center',
 					}}
 					src={src}
-				/>
-			</AbsoluteFill>
+					/>
+					</Sequence>
+				<Sequence from={60} durationInFrames={120}>
+				<OffthreadVideo
+					style={{
+						objectFit: 'contain',
+						objectPosition: 'center',
+					}}
+					src={src}
+					/>
+					</Sequence>
+
+			{/* </AbsoluteFill> */}
 			{subtitles.map((subtitle, index) => {
 				const nextSubtitle = subtitles[index + 1] ?? null;
 				const subtitleStartFrame = subtitle.startInSeconds * fps;
@@ -115,6 +131,15 @@ export const CaptionedVideo: React.FC<{
 				);
 			})}
 			{getFileExists(subtitlesFile) ? null : <NoCaptionFile />}
+			<AbsoluteFill>
+      {/* <Audio volume={0.5} src={staticFile("background.mp3")} /> */}
+      <Audio
+        volume={(f) =>
+          interpolate(f, [0, 300], [0, 0.4], { extrapolateLeft: "clamp" })
+        }
+        src={staticFile("audio.mp3")}
+      />
+    </AbsoluteFill>
 		</AbsoluteFill>
 	);
 };
